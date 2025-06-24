@@ -61,6 +61,7 @@ function App() {
 
   const handleRegister = async (email, password, name, address, phone) => {
     try {
+      // 👉 Esto llama al backend insert-user.js vía Netlify redirect
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -119,10 +120,7 @@ function App() {
             />
           }
         />
-        <Route
-          path="/checkout-success"
-          element={<CheckoutSuccess />}
-        />
+        <Route path="/checkout-success" element={<CheckoutSuccess />} />
       </Routes>
     </Router>
   );
