@@ -1,61 +1,30 @@
-// netlify/functions/insert-user.js
-const { createClient } = require("./dbClient");
+const { Client } = require("pg");
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
-  const { email, password, name, address, phone } = JSON.parse(event.body || "{}");
-
-  // Validación básica
-  if (!email || !password) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, message: "Email y contraseña son obligatorios." }),
-    };
-  }
-
-  const client = createClient();
+  const { name, email, password } = JSON.parse(event.body);
+  const client = new Client({
+    connectionString: process.env.NETLIFY_DATABASE_URL,
+  });
 
   try {
     await client.connect();
 
     const result = await client.query(
-      `INSERT INTO users (email, password, name, address, phone)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [email, password, name || "", address || "", phone || ""]
+      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
+      [name, email, password]
     );
-
-    await client.end();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        message: "Usuario registrado",
-        user: result.rows[0],
-      }),
+      body: JSON.stringify({ success: true, user: result.rows[0] }),
     };
-  } catch (err) {
-    await client.end();
-
-    if (err.code === '23505') {
-      // Error de duplicado (email ya registrado)
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          message: "El correo ya está registrado.",
-        }),
-      };
-    }
-
+  } catch (error) {
+    console.error("Error al registrar:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: err.message }),
+      body: JSON.stringify({ success: false, message: "Error en el servidor" }),
     };
+  } finally {
+    await client.end();
   }
 };
-
