@@ -2,7 +2,14 @@
 export const loginUser = async (email, password) => {
   try {
     const res = await fetch(`/.netlify/functions/get-user-by-email?email=${encodeURIComponent(email)}`);
-    const data = await res.json();
+
+    let data;
+    try {
+      data = await res.json(); // Este puede fallar si res no es JSON válido
+    } catch (jsonErr) {
+      console.error("❌ Error al parsear respuesta JSON:", jsonErr);
+      return { success: false, message: "Respuesta del servidor inválida" };
+    }
 
     if (!data.success) {
       return { success: false, message: data.message || "Usuario no encontrado" };
@@ -16,6 +23,7 @@ export const loginUser = async (email, password) => {
 
     return { success: true, user };
   } catch (error) {
+    console.error("❌ Error en loginUser:", error);
     return { success: false, message: "Error al conectar con el servidor" };
   }
 };
