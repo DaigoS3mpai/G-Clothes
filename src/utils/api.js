@@ -2,21 +2,15 @@
 export const loginUser = async (email, password) => {
   try {
     const res = await fetch(`/.netlify/functions/get-user-by-email?email=${encodeURIComponent(email)}`);
+    if (!res.ok) throw new Error("Respuesta no válida del servidor");
 
-    let data;
-    try {
-      data = await res.json(); // Este puede fallar si res no es JSON válido
-    } catch (jsonErr) {
-      console.error("❌ Error al parsear respuesta JSON:", jsonErr);
-      return { success: false, message: "Respuesta del servidor inválida" };
-    }
+    const data = await res.json();
 
     if (!data.success) {
       return { success: false, message: data.message || "Usuario no encontrado" };
     }
 
     const user = data.user;
-
     if (user.password !== password) {
       return { success: false, message: "Contraseña incorrecta" };
     }
@@ -45,7 +39,8 @@ export const registerUser = async (email, password, name, address, phone) => {
       return { success: false, message: data.message || "Error al registrar" };
     }
   } catch (error) {
-    return { success: false, message: "Error de red" };
+    console.error("❌ Error en registerUser:", error);
+    return { success: false, message: "Error de red al registrar" };
   }
 };
 
@@ -53,6 +48,8 @@ export const registerUser = async (email, password, name, address, phone) => {
 export const getUserProfile = async (email) => {
   try {
     const res = await fetch(`/.netlify/functions/get-user-by-email?email=${encodeURIComponent(email)}`);
+    if (!res.ok) throw new Error("Respuesta no válida");
+
     const data = await res.json();
 
     if (data.success) {
@@ -61,6 +58,7 @@ export const getUserProfile = async (email) => {
       return { success: false, message: data.message || "Usuario no encontrado" };
     }
   } catch (error) {
+    console.error("❌ Error en getUserProfile:", error);
     return { success: false, message: "Error al obtener el perfil" };
   }
 };
@@ -76,7 +74,7 @@ export const updateUserProfile = async (id, updates) => {
 
     const data = await res.json();
 
-    if (res.ok) {
+    if (res.ok && data.success) {
       return { success: true, user: data.user };
     } else {
       return {
@@ -85,7 +83,7 @@ export const updateUserProfile = async (id, updates) => {
       };
     }
   } catch (error) {
-    console.error("Error en updateUserProfile:", error);
+    console.error("❌ Error en updateUserProfile:", error);
     return {
       success: false,
       message: "Error de red al actualizar el perfil.",
@@ -110,6 +108,7 @@ export const addPurchaseToHistory = async (userId, cartItems, amount) => {
       return { success: false, message: data.message || "Error al guardar compra" };
     }
   } catch (error) {
+    console.error("❌ Error en addPurchaseToHistory:", error);
     return { success: false, message: "Error al guardar la compra" };
   }
 };
@@ -131,6 +130,7 @@ export const requestRefund = async (userId, purchaseId) => {
       return { success: false, message: data.message || "No se pudo procesar el reembolso" };
     }
   } catch (error) {
+    console.error("❌ Error en requestRefund:", error);
     return { success: false, message: "Error al solicitar el reembolso" };
   }
 };
