@@ -25,14 +25,15 @@ const CheckoutSuccess = ({ onPurchase }) => {
               user_id: currentUser.id,
               cartItems,
               amount: total,
+              payment_id: paymentId, // ✅ AÑADIDO
             }),
           });
 
           const data = await res.json();
           if (data.success) {
             setPurchaseRegistered(true);
-            localStorage.removeItem("cart");
-            onPurchase(); // <- vacía el carrito en el state
+            localStorage.removeItem("cart"); // ✅ Vacía localStorage
+            onPurchase(); // ✅ Vacía el estado del carrito
           }
         } catch (err) {
           console.error("Error al registrar la compra:", err);
@@ -41,7 +42,7 @@ const CheckoutSuccess = ({ onPurchase }) => {
     };
 
     registerPurchase();
-  }, [status, purchaseRegistered, onPurchase]);
+  }, [status, purchaseRegistered, onPurchase, paymentId]);
 
   const renderContent = () => {
     switch (status) {
