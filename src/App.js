@@ -7,7 +7,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import { loginUser, registerUser } from "./util/api"; // ✅ Importa desde util/api.js
+import { loginUser, registerUser } from "./utils/api"; // ✅ Importa desde utils/api.js
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -41,7 +41,7 @@ function App() {
   };
 
   const handleLogin = async (email, password) => {
-    const res = await loginUser(email, password); // ✅ Usa tu función de util/api
+    const res = await loginUser(email, password); // ✅ Usa tu función de utils/api
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
@@ -50,7 +50,7 @@ function App() {
   };
 
   const handleRegister = async (email, password, name, address, phone) => {
-    const res = await registerUser(email, password, name, address, phone); // ✅ Usa tu función de util/api
+    const res = await registerUser(email, password, name, address, phone); // ✅ Usa tu función de utils/api
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
