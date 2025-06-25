@@ -1,12 +1,12 @@
-// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import Products from "./pages/Products"; // ✅ Se cambió de ProductList a Products
+import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import { loginUser, registerUser } from "./util/api"; // ✅ Importación correcta
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -39,45 +39,27 @@ function App() {
     setCurrentUser(null);
   };
 
+  // ✅ Usamos el archivo api.js para login
   const handleLogin = async (email, password) => {
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-        setCurrentUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch {
-      return { success: false, message: "Error en el servidor." };
+    const result = await loginUser(email, password);
+    if (result.success) {
+      localStorage.setItem("currentUser", JSON.stringify(result.user));
+      setCurrentUser(result.user);
+      return { success: true };
+    } else {
+      return { success: false, message: result.message };
     }
   };
 
+  // ✅ Usamos el archivo api.js para registro
   const handleRegister = async (email, password, name, address, phone) => {
-    try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, address, phone }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-        setCurrentUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch {
-      return { success: false, message: "Error en el servidor." };
+    const result = await registerUser(email, password, name, address, phone);
+    if (result.success) {
+      localStorage.setItem("currentUser", JSON.stringify(result.user));
+      setCurrentUser(result.user);
+      return { success: true };
+    } else {
+      return { success: false, message: result.message };
     }
   };
 
