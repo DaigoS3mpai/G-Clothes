@@ -9,7 +9,7 @@ const Products = ({ onAddToCart }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/get-products");
+        const res = await fetch("/.netlify/functions/get-products");
         const data = await res.json();
         if (data.success) {
           setProducts(data.products);
@@ -17,7 +17,7 @@ const Products = ({ onAddToCart }) => {
           setError("No se pudieron cargar los productos.");
         }
       } catch (err) {
-        console.error("Error al obtener productos:", err);
+        console.error("❌ Error al obtener productos:", err);
         setError("Error en el servidor.");
       } finally {
         setLoading(false);
