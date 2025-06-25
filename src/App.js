@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// src/App.js
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Products from "./pages/Products";
@@ -6,6 +7,10 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import {
+  loginUser,
+  registerUser,
+} from "./utils/api"; // Asegúrate que la ruta sea correcta y el archivo exista
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -17,6 +22,8 @@ function App() {
     const storedUser = localStorage.getItem("currentUser");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
@@ -39,63 +46,48 @@ function App() {
   };
 
   const handleLogin = async (email, password) => {
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-        setCurrentUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (err) {
-      return { success: false, message: "Error en el servidor." };
+    const res = await loginUser(email, password);
+    if (res.success) {
+      localStorage.setItem("currentUser", JSON.stringify(res.user));
+      setCurrentUser(res.user);
+      setShowLogin(false);
     }
+    return res;
   };
 
   const handleRegister = async (email, password, name, address, phone) => {
-    try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, address, phone }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-        setCurrentUser(data.user);
-        return { success: true };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (err) {
-      return { success: false, message: "Error en el servidor." };
+    const res = await registerUser(email, password, name, address, phone);
+    if (res.success) {
+      localStorage.setItem("currentUser", JSON.stringify(res.user));
+      setCurrentUser(res.user);
+      setShowLogin(false);
     }
+    return res;
   };
 
   return (
     <Router>
-      <Header cartCount={cartItems.length} />
+      <Header
+        cartCount={cartItems.length}
+        currentUser={currentUser}
+        onLoginClick={() => setShowLogin(true)}
+        onLogout={handleLogout}
+      />
+
+      {showLogin && (
+        <Login
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          onClose={() => setShowLogin(false)}
+        />
+      )}
+
       <Routes>
         <Route
           path="/"
-          element={
-            <div className="text-center mt-10 text-green-600">
-              Página de inicio
-            </div>
-          }
+          element={<div className="text-center mt-10 text-green-600">Página de inicio</div>}
         />
-        <Route
-          path="/products"
-          element={<Products onAddToCart={addToCart} />}
-        />
+        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
         <Route
           path="/cart"
           element={
@@ -103,6 +95,7 @@ function App() {
               cartItems={cartItems}
               onRemoveFromCart={removeFromCart}
               onPurchase={clearCart}
+              currentUser={currentUser}
             />
           }
         />
@@ -110,16 +103,6 @@ function App() {
           path="/profile"
           element={
             <Profile currentUser={currentUser} onLogout={handleLogout} />
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <Login
-              onLogin={handleLogin}
-              onRegister={handleRegister}
-              onClose={() => window.history.back()}
-            />
           }
         />
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
