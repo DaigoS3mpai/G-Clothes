@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const ProductList = ({ products, onAddToCart }) => {
   const [selectedCategory, setSelectedCategory] = useState('Todas');
-  const [selectedSizes, setSelectedSizes] = useState({}); // Guardar talla por producto
+  const [selectedSizes, setSelectedSizes] = useState({});
 
   const categories = ['Todas', ...new Set(products.map((p) => p.category))];
 
@@ -24,7 +24,7 @@ const ProductList = ({ products, onAddToCart }) => {
   const handleAdd = (product) => {
     const size = selectedSizes[product.id];
     if (!size) {
-      alert("Por favor selecciona una talla antes de agregar al carrito.");
+      alert('Por favor selecciona una talla antes de agregar al carrito.');
       return;
     }
 
@@ -35,6 +35,12 @@ const ProductList = ({ products, onAddToCart }) => {
       selectedSize: size,
       price,
     });
+  };
+
+  const parseSizes = (rawSizes) => {
+    if (Array.isArray(rawSizes)) return rawSizes;
+    if (typeof rawSizes === 'string') return rawSizes.split(',').map(s => s.trim());
+    return ['S', 'M', 'L', 'XL'];
   };
 
   return (
@@ -80,7 +86,7 @@ const ProductList = ({ products, onAddToCart }) => {
                   className="w-full border rounded px-2 py-1"
                 >
                   <option value="">Seleccionar</option>
-                  {(product.sizes || ['S', 'M', 'L', 'XL']).map((size) => (
+                  {parseSizes(product.sizes).map((size) => (
                     <option key={size} value={size}>
                       {size}
                     </option>
