@@ -1,5 +1,15 @@
 // netlify/functions/insert-user.js
-const { createClient } = require("./dbClient");
+const { Client } = require("pg");
+
+// Crea el cliente con la variable de entorno de Netlify
+const createClient = () => {
+  return new Client({
+    connectionString: process.env.NETLIFY_DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false, // necesario si estás usando Neon o similar
+    },
+  });
+};
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -16,7 +26,7 @@ exports.handler = async (event) => {
   try {
     parsed = JSON.parse(event.body);
   } catch (err) {
-    console.error("Error al parsear JSON:", err);
+    console.error("❌ Error al parsear JSON:", err);
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -59,7 +69,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ success: true, user: result.rows[0] }),
     };
   } catch (error) {
-    console.error("Error al registrar:", error);
+    console.error("❌ Error al registrar en la base de datos:", error);
     await client.end();
     return {
       statusCode: 500,
