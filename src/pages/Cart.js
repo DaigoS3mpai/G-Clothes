@@ -16,7 +16,7 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  const total = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
 
   const handleCheckout = async () => {
     if (!currentUser) {
