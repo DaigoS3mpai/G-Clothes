@@ -1,7 +1,9 @@
+//scr/pages/Cart
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import CartItem from "../components/CartItem";
 
-// Formateador CLP
+// Formatear CLP sin decimales
 const formatPrice = (price) =>
   new Intl.NumberFormat("es-CL", {
     style: "currency",
@@ -64,23 +66,12 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
         <>
           <ul className="space-y-4">
             {cartItems.map((item, index) => (
-              <li key={index} className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-gray-600">
-                    Talla: <strong>{item.selectedSize || "No seleccionada"}</strong>
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span>{formatPrice(item.price)}</span>
-                  <button
-                    className="text-red-500 text-sm hover:underline"
-                    onClick={() => onRemoveFromCart(index)}
-                  >
-                    Quitar
-                  </button>
-                </div>
-              </li>
+              <CartItem
+                key={index}
+                item={item}
+                index={index}
+                onRemove={onRemoveFromCart}
+              />
             ))}
           </ul>
 
