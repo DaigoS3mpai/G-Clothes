@@ -7,7 +7,10 @@ exports.handler = async (event) => {
   if (!name || !email || !password || !address || !phone) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ success: false, message: "Todos los campos son obligatorios" }),
+      body: JSON.stringify({
+        success: false,
+        message: "Todos los campos son obligatorios",
+      }),
     };
   }
 
@@ -34,7 +37,11 @@ exports.handler = async (event) => {
     await client.end();
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: error.message || "Error en el servidor" }),
+      body: JSON.stringify({
+        success: false,
+        message: error.message || "Error en el servidor",
+        detail: error.detail || null,
+      }),
     };
   }
 };
