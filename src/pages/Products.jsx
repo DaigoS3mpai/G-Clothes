@@ -11,14 +11,15 @@ const Products = ({ onAddToCart }) => {
       try {
         const res = await fetch("/.netlify/functions/get-products");
         const data = await res.json();
+        console.log("🧾 Productos recibidos:", data);
+
         if (data.success && Array.isArray(data.products)) {
           setProducts(data.products);
         } else {
-          console.error("❌ Respuesta inesperada:", data);
           setError("No se pudieron cargar los productos.");
         }
       } catch (err) {
-        console.error("❌ Error en fetch:", err);
+        console.error("Error al obtener productos:", err);
         setError("Error en el servidor.");
       } finally {
         setLoading(false);
@@ -47,13 +48,9 @@ const Products = ({ onAddToCart }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-      {products.map((product) => {
-        if (!product || !product.id || !product.name || typeof product.price !== "number") {
-          console.warn("❗ Producto inválido:", product);
-          return null;
-        }
-
-        return (
+      {products
+        .filter((p) => p && p.id && p.name && typeof p.price === "number")
+        .map((product) => (
           <div key={product.id} className="border p-4 rounded shadow">
             <h3 className="text-lg font-semibold">{product.name}</h3>
             <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
@@ -77,8 +74,7 @@ const Products = ({ onAddToCart }) => {
               Agregar al carrito
             </button>
           </div>
-        );
-      })}
+        ))}
     </div>
   );
 };
