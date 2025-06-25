@@ -6,6 +6,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import Home from "./pages/Home"; // 👈 Asegúrate de tener este import
 import { loginUser, registerUser } from "./utils/api";
 
 function App() {
@@ -66,18 +67,8 @@ function App() {
       />
 
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div className="text-center mt-10 text-green-600">
-              Página de inicio
-            </div>
-          }
-        />
-        <Route
-          path="/products"
-          element={<Products onAddToCart={addToCart} />}
-        />
+        <Route path="/" element={<Home onAddToCart={addToCart} />} /> {/* ✅ Página de inicio real */}
+        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
         <Route
           path="/cart"
           element={
