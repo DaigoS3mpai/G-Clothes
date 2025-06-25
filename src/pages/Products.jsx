@@ -1,3 +1,4 @@
+// src/pages/Products.jsx
 import React, { useEffect, useState } from "react";
 import ProductList from "../components/ProductList";
 
@@ -11,14 +12,13 @@ const Products = ({ onAddToCart }) => {
       try {
         const res = await fetch("/.netlify/functions/get-products");
         const data = await res.json();
-
         if (data.success) {
           setProducts(data.products);
         } else {
           setError("No se pudieron cargar los productos.");
         }
       } catch (err) {
-        console.error("Error al obtener productos:", err);
+        console.error("❌ Error al obtener productos:", err);
         setError("Error en el servidor.");
       } finally {
         setLoading(false);
