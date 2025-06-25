@@ -1,5 +1,4 @@
 // netlify/functions/add-purchase.js
-// netlify/functions/add-purchase.js
 const { createClient } = require("./dbClient");
 
 exports.handler = async (event) => {
@@ -12,6 +11,14 @@ exports.handler = async (event) => {
     };
   }
 
+  const safeAmount = parseFloat(amount);
+  if (isNaN(safeAmount)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ success: false, message: "El monto es inválido." }),
+    };
+  }
+
   const client = createClient();
 
   try {
@@ -20,7 +27,7 @@ exports.handler = async (event) => {
     // Insertar en purchase_history
     const purchaseResult = await client.query(
       "INSERT INTO purchase_history (user_id, product, amount) VALUES ($1, $2, $3) RETURNING id",
-      [user_id, cartItems.map((item) => item.name).join(", "), amount]
+      [user_id, cartItems.map((item) => item.name).join(", "), safeAmount]
     );
 
     const purchaseId = purchaseResult.rows[0].id;
@@ -30,13 +37,12 @@ exports.handler = async (event) => {
       if (!item.id || !item.selectedSize) {
         throw new Error("Cada producto debe tener un ID y una talla seleccionada.");
       }
-    
+
       await client.query(
         "INSERT INTO purchase_items (purchase_id, product_id, size, quantity) VALUES ($1, $2, $3, $4)",
         [purchaseId, item.id, item.selectedSize, 1]
       );
     }
-
 
     await client.end();
 
