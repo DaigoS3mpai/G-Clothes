@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import ProductList from "./pages/ProductList";
+import ProductList from "./components/ProductList"; // ✅ Ruta corregida
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
-import CheckoutSuccess from "./pages/CheckoutSuccess"; // ✅ nuevo
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -61,7 +61,6 @@ function App() {
 
   const handleRegister = async (email, password, name, address, phone) => {
     try {
-      // 👉 Esto llama al backend insert-user.js vía Netlify redirect
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
