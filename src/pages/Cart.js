@@ -32,7 +32,7 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
     }
 
     try {
-      const res = await fetch("/api/add-purchase", {
+      const res = await fetch("/.netlify/functions/add-purchase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
