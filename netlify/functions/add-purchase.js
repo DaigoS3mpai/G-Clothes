@@ -2,7 +2,7 @@
 const { createClient } = require("./dbClient");
 
 exports.handler = async (event) => {
-  const { user_id, cartItems, amount } = JSON.parse(event.body || "{}");
+  const { user_id, cartItems, amount, payment_id } = JSON.parse(event.body || "{}");
 
   if (!user_id || !cartItems || !amount) {
     return {
@@ -24,10 +24,10 @@ exports.handler = async (event) => {
   try {
     await client.connect();
 
-    // Insertar en purchase_history
+    // ✅ Insertar en purchase_history (ahora con payment_id si está disponible)
     const purchaseResult = await client.query(
-      "INSERT INTO purchase_history (user_id, product, amount) VALUES ($1, $2, $3) RETURNING id",
-      [user_id, cartItems.map((item) => item.name).join(", "), safeAmount]
+      "INSERT INTO purchase_history (user_id, product, amount, payment_id) VALUES ($1, $2, $3, $4) RETURNING id",
+      [user_id, cartItems.map((item) => item.name).join(", "), safeAmount, payment_id || null]
     );
 
     const purchaseId = purchaseResult.rows[0].id;
