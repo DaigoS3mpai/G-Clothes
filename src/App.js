@@ -1,7 +1,8 @@
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
-import ProductList from "./components/ProductList"; // ✅ Ruta corregida
+import Products from "./pages/Products"; // ✅ Se cambió de ProductList a Products
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
@@ -92,7 +93,7 @@ function App() {
             </div>
           }
         />
-        <Route path="/products" element={<ProductList onAddToCart={addToCart} />} />
+        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
         <Route
           path="/cart"
           element={
@@ -105,9 +106,7 @@ function App() {
         />
         <Route
           path="/profile"
-          element={
-            <Profile currentUser={currentUser} onLogout={handleLogout} />
-          }
+          element={<Profile currentUser={currentUser} onLogout={handleLogout} />}
         />
         <Route
           path="/login"
