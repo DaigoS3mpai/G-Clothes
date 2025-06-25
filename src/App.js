@@ -1,3 +1,4 @@
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
@@ -86,7 +87,17 @@ function App() {
           path="/"
           element={<div className="text-center mt-10 text-green-600">Página de inicio</div>}
         />
-        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
+
+        {/* ✅ RUTA DE PRODUCTOS */}
+        <Route
+          path="/products"
+          element={
+            <Products
+              onAddToCart={addToCart}
+            />
+          }
+        />
+
         <Route
           path="/cart"
           element={
@@ -98,12 +109,17 @@ function App() {
             />
           }
         />
+
         <Route
           path="/profile"
           element={
-            <Profile currentUser={currentUser} onLogout={handleLogout} />
+            <Profile
+              currentUser={currentUser}
+              onLogout={handleLogout}
+            />
           }
         />
+
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
       </Routes>
     </Router>
