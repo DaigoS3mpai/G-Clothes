@@ -16,12 +16,14 @@ exports.handler = async (event) => {
   try {
     parsed = JSON.parse(event.body);
   } catch (err) {
+    console.error("Error al parsear JSON:", err);
     return {
       statusCode: 400,
       body: JSON.stringify({
         success: false,
-        message: "JSON inválido en el body",
-        detail: err.message,
+        message: "El body no es un JSON válido",
+        error: err.message,
+        bodyRecibido: event.body,
       }),
     };
   }
@@ -63,8 +65,8 @@ exports.handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({
         success: false,
-        message: error.message || "Error en el servidor",
-        detail: error.detail || null,
+        message: "Error al registrar en la base de datos",
+        error: error.message,
       }),
     };
   }
