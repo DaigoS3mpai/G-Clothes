@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -10,31 +11,37 @@ const Header = ({ cartCount = 0, currentUser, onLogout }) => {
   };
 
   return (
-    <header className="bg-white shadow p-4 flex justify-between items-center">
-      <Link to="/" className="text-xl font-bold">
+    <header className="bg-[#002e5d] text-white shadow-md px-6 py-4 flex justify-between items-center">
+      <Link to="/" className="text-2xl font-bold text-[#ffcc00] tracking-wide">
         GClothes
       </Link>
 
-      <nav className="space-x-4">
-        <Link to="/products" className="hover:text-blue-500">
+      <nav className="flex space-x-6 items-center text-sm sm:text-base">
+        <Link to="/products" className="hover:text-[#ffcc00] transition">
           Productos
         </Link>
 
-        <Link to="/cart" className="hover:text-blue-500">
+        <Link to="/cart" className="hover:text-[#ffcc00] transition">
           Carrito ({cartCount})
         </Link>
 
         {currentUser ? (
           <>
-            <Link to="/profile" className="hover:text-blue-500">
+            <Link to="/profile" className="hover:text-[#ffcc00] transition">
               Perfil
             </Link>
-            <button onClick={onLogout} className="text-red-600 hover:underline">
+            <button
+              onClick={onLogout}
+              className="ml-2 px-3 py-1 bg-white text-[#002e5d] rounded hover:bg-[#ffcc00] hover:text-black transition"
+            >
               Cerrar sesión
             </button>
           </>
         ) : (
-          <button onClick={handleLoginClick} className="text-blue-600 hover:underline">
+          <button
+            onClick={handleLoginClick}
+            className="ml-2 px-4 py-1 bg-[#ffcc00] text-black font-medium rounded hover:bg-white hover:text-[#002e5d] transition"
+          >
             Iniciar sesión
           </button>
         )}
