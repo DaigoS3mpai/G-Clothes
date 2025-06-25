@@ -9,39 +9,41 @@ const CheckoutSuccess = () => {
   const [purchaseRegistered, setPurchaseRegistered] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const registerPurchase = async () => {
-      if (status === "approved" && !purchaseRegistered) {
-        const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
+useEffect(() => {
+  const registerPurchase = async () => {
+    if (status === "approved" && !purchaseRegistered) {
+      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
 
-        if (!currentUser || cartItems.length === 0) return;
+      if (!currentUser || cartItems.length === 0) return;
 
-        try {
-          const res = await fetch("/.netlify/functions/add-purchase", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              user_id: currentUser.id,
-              cartItems,
-              amount: total,
-            }),
-          });
+      try {
+        const res = await fetch("/.netlify/functions/add-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: currentUser.id,
+            cartItems,
+            amount: total,
+            payment_id: paymentId, // ✅ ahora se guarda el ID del pago
+          }),
+        });
 
-          const data = await res.json();
-          if (data.success) {
-            setPurchaseRegistered(true);
-            localStorage.removeItem("cart"); // Limpia el carrito
-          }
-        } catch (err) {
-          console.error("Error al registrar la compra:", err);
+        const data = await res.json();
+        if (data.success) {
+          setPurchaseRegistered(true);
+          localStorage.removeItem("cart");
         }
+      } catch (err) {
+        console.error("Error al registrar la compra:", err);
       }
-    };
+    }
+  };
 
-    registerPurchase();
-  }, [status, purchaseRegistered]);
+  registerPurchase();
+}, [status, purchaseRegistered]);
+
 
   const renderContent = () => {
     switch (status) {
