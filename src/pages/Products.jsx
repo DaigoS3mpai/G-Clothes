@@ -11,8 +11,15 @@ const Products = ({ onAddToCart }) => {
     const fetchProducts = async () => {
       try {
         const res = await fetch("/.netlify/functions/get-products");
+
+        if (!res.ok) {
+          throw new Error(`Respuesta HTTP no exitosa: ${res.status}`);
+        }
+
         const data = await res.json();
-        if (data.success) {
+        console.log("📦 Productos recibidos:", data);
+
+        if (data.success && Array.isArray(data.products)) {
           setProducts(data.products);
         } else {
           setError("No se pudieron cargar los productos.");
@@ -31,7 +38,12 @@ const Products = ({ onAddToCart }) => {
   if (loading) return <div className="p-6">Cargando productos...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
 
-  return <ProductList products={products} onAddToCart={onAddToCart} />;
+  return (
+    <ProductList
+      products={products}
+      onAddToCart={onAddToCart}
+    />
+  );
 };
 
 export default Products;
