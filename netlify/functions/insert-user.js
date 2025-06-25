@@ -2,7 +2,6 @@ const { Client } = require("pg");
 
 exports.handler = async (event) => {
   const { name, email, password, address, phone } = JSON.parse(event.body);
-
   const client = new Client({
     connectionString: process.env.NETLIFY_DATABASE_URL,
   });
@@ -25,7 +24,10 @@ exports.handler = async (event) => {
     console.error("Error al registrar:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, message: "Error en el servidor" }),
+      body: JSON.stringify({
+        success: false,
+        message: "Error en el servidor: " + error.message,
+      }),
     };
   } finally {
     await client.end();
