@@ -9,12 +9,30 @@ const Home = ({ onAddToCart }) => {
       const response = await getAllProducts();
       if (response.success && response.products.length > 0) {
         const shuffled = [...response.products].sort(() => 0.5 - Math.random());
-        setFeaturedProducts(shuffled.slice(0, 3));
+        const selected = shuffled.slice(0, 3).map((product) => ({
+          ...product,
+          selectedSize: '', // Inicializar sin talla
+        }));
+        setFeaturedProducts(selected);
       }
     };
 
     fetchProducts();
   }, []);
+
+  const handleSizeChange = (index, size) => {
+    const updated = [...featuredProducts];
+    updated[index].selectedSize = size;
+    setFeaturedProducts(updated);
+  };
+
+  const handleAddToCart = (product) => {
+    if (!product.selectedSize) {
+      alert(`Selecciona una talla para ${product.name}`);
+      return;
+    }
+    onAddToCart({ ...product, price: Number(product.price) });
+  };
 
   const formatCLP = (price) =>
     new Intl.NumberFormat('es-CL', {
@@ -35,7 +53,7 @@ const Home = ({ onAddToCart }) => {
         <>
           <h2 className="text-2xl font-semibold mb-4">Productos destacados</h2>
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {featuredProducts.map((product) => (
+            {featuredProducts.map((product, index) => (
               <div key={product.id} className="bg-white p-4 rounded shadow">
                 <img
                   src={product.image}
@@ -45,8 +63,21 @@ const Home = ({ onAddToCart }) => {
                 <h3 className="text-lg font-semibold">{product.name}</h3>
                 <p className="text-gray-600">{product.category}</p>
                 <p className="text-blue-600 font-bold">{formatCLP(product.price)}</p>
+
+                <select
+                  value={product.selectedSize}
+                  onChange={(e) => handleSizeChange(index, e.target.value)}
+                  className="w-full mt-2 border rounded p-1"
+                >
+                  <option value="">Selecciona talla</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                </select>
+
                 <button
-                  onClick={() => onAddToCart({ ...product, selectedSize: 'M', price: Number(product.price) })}
+                  onClick={() => handleAddToCart(product)}
                   className="mt-3 w-full bg-blue-600 text-white py-1 rounded hover:bg-blue-700"
                 >
                   Agregar al carrito
