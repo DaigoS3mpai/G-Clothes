@@ -4,12 +4,13 @@ const { createClient } = require("./dbClient");
 exports.handler = async (event) => {
   const { user_id, cartItems, amount, payment_id } = JSON.parse(event.body || "{}");
 
-  if (!user_id || !cartItems || !amount) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, message: "Faltan datos de compra" }),
-    };
-  }
+if (!user_id || !cartItems || !amount || !payment_id) {
+  return {
+    statusCode: 400,
+    body: JSON.stringify({ success: false, message: "Faltan datos de compra o payment_id" }),
+  };
+}
+
 
   const safeAmount = parseFloat(amount);
   if (isNaN(safeAmount)) {
