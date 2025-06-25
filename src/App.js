@@ -1,3 +1,4 @@
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
@@ -6,7 +7,6 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import Home from "./pages/Home"; // 👈 Asegúrate de tener este import
 import { loginUser, registerUser } from "./utils/api";
 
 function App() {
@@ -67,8 +67,18 @@ function App() {
       />
 
       <Routes>
-        <Route path="/" element={<Home onAddToCart={addToCart} />} /> {/* ✅ Página de inicio real */}
-        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
+        <Route
+          path="/"
+          element={
+            <div className="text-center mt-10 text-green-600">
+              Página de inicio
+            </div>
+          }
+        />
+        <Route
+          path="/products"
+          element={<Products onAddToCart={addToCart} />}
+        />
         <Route
           path="/cart"
           element={
@@ -86,7 +96,10 @@ function App() {
             <Profile currentUser={currentUser} onLogout={handleLogout} />
           }
         />
-        <Route path="/checkout-success" element={<CheckoutSuccess />} />
+        <Route
+          path="/checkout-success"
+          element={<CheckoutSuccess onPurchase={clearCart} />}
+        />
         <Route
           path="/login"
           element={
