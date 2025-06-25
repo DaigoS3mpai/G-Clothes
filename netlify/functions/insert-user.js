@@ -2,7 +2,31 @@
 const { createClient } = require("./dbClient");
 
 exports.handler = async (event) => {
-  const { name, email, password, address, phone } = JSON.parse(event.body);
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({
+        success: false,
+        message: "Método no permitido",
+      }),
+    };
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(event.body);
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        success: false,
+        message: "JSON inválido en el body",
+        detail: err.message,
+      }),
+    };
+  }
+
+  const { name, email, password, address, phone } = parsed;
 
   if (!name || !email || !password || !address || !phone) {
     return {
