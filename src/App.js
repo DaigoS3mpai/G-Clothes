@@ -1,4 +1,3 @@
-// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
@@ -10,7 +9,7 @@ import CheckoutSuccess from "./pages/CheckoutSuccess";
 import {
   loginUser,
   registerUser,
-} from "./utils/api"; // Asegúrate que la ruta sea correcta y el archivo exista
+} from "./utils/api";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -87,14 +86,7 @@ function App() {
           path="/"
           element={<div className="text-center mt-10 text-green-600">Página de inicio</div>}
         />
-        <Route
-          path="/products"
-          element={
-            <Products
-              onAddToCart={addToCart}
-            />
-          }
-        />
+        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
         <Route
           path="/cart"
           element={
