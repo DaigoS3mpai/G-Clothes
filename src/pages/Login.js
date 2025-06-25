@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Login = ({ onLogin, onRegister, onClose }) => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -10,6 +11,10 @@ const Login = ({ onLogin, onRegister, onClose }) => {
     phone: '',
   });
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const previousPath = location.state?.from || '/'; // Ruta previa o inicio
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -49,11 +54,19 @@ const Login = ({ onLogin, onRegister, onClose }) => {
       }
       const { email, password, name, address, phone } = formData;
       const res = await onRegister(email, password, name, address, phone);
-      if (!res.success) setError(res.message);
+      if (!res.success) {
+        setError(res.message);
+      } else {
+        navigate(previousPath); // ✅ Redirige a la ruta previa
+      }
     } else {
       const { email, password } = formData;
       const res = await onLogin(email, password);
-      if (!res.success) setError(res.message);
+      if (!res.success) {
+        setError(res.message);
+      } else {
+        navigate(previousPath); // ✅ Redirige a la ruta previa
+      }
     }
   };
 
