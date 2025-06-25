@@ -134,3 +134,21 @@ export const requestRefund = async (userId, purchaseId) => {
     return { success: false, message: "Error al solicitar el reembolso" };
   }
 };
+
+// 👕 Obtener todos los productos
+export const getAllProducts = async () => {
+  try {
+    const res = await fetch('/.netlify/functions/get-products');
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      return { success: true, products: data.products };
+    } else {
+      return { success: false, message: data.message || 'No se pudieron obtener los productos' };
+    }
+  } catch (error) {
+    console.error('❌ Error en getAllProducts:', error);
+    return { success: false, message: 'Error de red al obtener productos' };
+  }
+};
+
