@@ -1,8 +1,8 @@
-//scr/pages/Cart
+// src/pages/Cart.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import CartItem from "../components/CartItem";
-import { initializeMercadoPago, createPayment } from "../utils/mercadoPago";
+import { initializeMercadoPago } from "../utils/mercadoPago"; // Asegúrate de tener este archivo
 
 // Formatear CLP sin decimales
 const formatPrice = (price) =>
@@ -33,41 +33,24 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
     }
 
     try {
-      // 1. Guardar compra en base de datos
-      const res = await fetch("/.netlify/functions/add-purchase", {
+      // Llamamos a la función create-preference del backend
+      const res = await fetch("/.netlify/functions/create-preference", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: currentUser.id,
-          cartItems,
-          amount: total,
-        }),
+        body: JSON.stringify({ cartItems }),
       });
 
       const data = await res.json();
 
-      if (!data.success) {
-        alert(data.message || "Error al procesar la compra");
-        return;
-      }
-
-      // 2. Iniciar MercadoPago y crear preferencia
-      const mp = await initializeMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
-      const preference = await createPayment(
-        mp,
-        import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
-        cartItems
-      );
-
-      if (preference && preference.init_point) {
-        // 3. Redirigir a MercadoPago
-        window.location.href = preference.init_point;
+      if (data && data.init_point) {
+        // Redirigimos al usuario al checkout de MercadoPago
+        window.location.href = data.init_point;
       } else {
-        alert("No se pudo generar el enlace de pago.");
+        alert("No se pudo generar la preferencia de pago");
       }
-    } catch (err) {
-      console.error("Error al finalizar compra:", err);
-      alert("Error en el servidor");
+    } catch (error) {
+      console.error("Error al generar preferencia:", error);
+      alert("Error al conectar con MercadoPago");
     }
   };
 
