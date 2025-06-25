@@ -1,19 +1,20 @@
-// src/pages/Cart.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import CartItem from "../components/CartItem";
+
+// Formateador CLP
+const formatPrice = (price) =>
+  new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
 
 const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
   const total = cartItems.reduce((sum, item) => sum + item.price, 0);
-
-  const formatPrice = (price) =>
-    new Intl.NumberFormat("es-CL", {
-      style: "currency",
-      currency: "CLP",
-    }).format(price);
 
   const handleCheckout = async () => {
     if (!currentUser) {
@@ -63,12 +64,23 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
         <>
           <ul className="space-y-4">
             {cartItems.map((item, index) => (
-              <CartItem
-                key={index}
-                item={item}
-                index={index}
-                onRemove={onRemoveFromCart}
-              />
+              <li key={index} className="flex justify-between items-center">
+                <div>
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-sm text-gray-600">
+                    Talla: <strong>{item.selectedSize || "No seleccionada"}</strong>
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span>{formatPrice(item.price)}</span>
+                  <button
+                    className="text-red-500 text-sm hover:underline"
+                    onClick={() => onRemoveFromCart(index)}
+                  >
+                    Quitar
+                  </button>
+                </div>
+              </li>
             ))}
           </ul>
 
