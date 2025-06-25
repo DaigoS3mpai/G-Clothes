@@ -1,9 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutSuccess = () => {
   const params = new URLSearchParams(window.location.search);
   const status = params.get("status");
   const paymentId = params.get("payment_id");
+
+  const [purchaseRegistered, setPurchaseRegistered] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const registerPurchase = async () => {
+      if (status === "approved" && !purchaseRegistered) {
+        const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
+
+        if (!currentUser || cartItems.length === 0) return;
+
+        try {
+          const res = await fetch("/.netlify/functions/add-purchase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: currentUser.id,
+              cartItems,
+              amount: total,
+            }),
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            setPurchaseRegistered(true);
+            localStorage.removeItem("cart"); // Limpia el carrito
+          }
+        } catch (err) {
+          console.error("Error al registrar la compra:", err);
+        }
+      }
+    };
+
+    registerPurchase();
+  }, [status, purchaseRegistered]);
 
   const renderContent = () => {
     switch (status) {
@@ -13,6 +51,12 @@ const CheckoutSuccess = () => {
             <h2 className="text-2xl font-bold text-green-600 mb-4">¡Gracias por tu compra!</h2>
             <p className="text-gray-700 mb-2">Tu pago fue aprobado correctamente.</p>
             <p className="text-sm text-gray-500">ID de pago: {paymentId}</p>
+            <button
+              onClick={() => navigate("/products")}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Seguir comprando
+            </button>
           </>
         );
       case "pending":
@@ -50,4 +94,3 @@ const CheckoutSuccess = () => {
 };
 
 export default CheckoutSuccess;
-
