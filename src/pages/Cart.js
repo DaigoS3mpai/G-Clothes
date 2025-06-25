@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import CartItem from "../components/CartItem";
+import { initializeMercadoPago, createPayment } from "../utils/mercadoPago";
 
 // Formatear CLP sin decimales
 const formatPrice = (price) =>
@@ -32,6 +33,7 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
     }
 
     try {
+      // 1. Guardar compra en base de datos
       const res = await fetch("/.netlify/functions/add-purchase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -44,11 +46,24 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
 
       const data = await res.json();
 
-      if (data.success) {
-        onPurchase();
-        navigate("/checkout-success");
-      } else {
+      if (!data.success) {
         alert(data.message || "Error al procesar la compra");
+        return;
+      }
+
+      // 2. Iniciar MercadoPago y crear preferencia
+      const mp = await initializeMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+      const preference = await createPayment(
+        mp,
+        import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN,
+        cartItems
+      );
+
+      if (preference && preference.init_point) {
+        // 3. Redirigir a MercadoPago
+        window.location.href = preference.init_point;
+      } else {
+        alert("No se pudo generar el enlace de pago.");
       }
     } catch (err) {
       console.error("Error al finalizar compra:", err);
