@@ -1,5 +1,5 @@
 // src/App.js
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Products from "./pages/Products";
@@ -7,7 +7,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import { loginUser, registerUser } from "./utils/api"; // ✅ Importa desde utils/api.js
+import { loginUser, registerUser } from "./utils/api";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -41,7 +41,7 @@ function App() {
   };
 
   const handleLogin = async (email, password) => {
-    const res = await loginUser(email, password); // ✅ Usa tu función de utils/api
+    const res = await loginUser(email, password);
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
@@ -50,7 +50,7 @@ function App() {
   };
 
   const handleRegister = async (email, password, name, address, phone) => {
-    const res = await registerUser(email, password, name, address, phone); // ✅ Usa tu función de utils/api
+    const res = await registerUser(email, password, name, address, phone);
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
@@ -60,7 +60,7 @@ function App() {
 
   return (
     <Router>
-      <Header cartCount={cartItems.length} />
+      <Header cartCount={cartItems.length} currentUser={currentUser} onLogout={handleLogout} />
       <Routes>
         <Route
           path="/"
