@@ -1,3 +1,4 @@
+// src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
@@ -6,7 +7,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import { loginUser, registerUser } from "./util/api"; // ✅ Importación correcta
+import { loginUser, registerUser } from "./util/api"; // ✅ Importa desde util/api.js
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -39,28 +40,22 @@ function App() {
     setCurrentUser(null);
   };
 
-  // ✅ Usamos el archivo api.js para login
   const handleLogin = async (email, password) => {
-    const result = await loginUser(email, password);
-    if (result.success) {
-      localStorage.setItem("currentUser", JSON.stringify(result.user));
-      setCurrentUser(result.user);
-      return { success: true };
-    } else {
-      return { success: false, message: result.message };
+    const res = await loginUser(email, password); // ✅ Usa tu función de util/api
+    if (res.success) {
+      localStorage.setItem("currentUser", JSON.stringify(res.user));
+      setCurrentUser(res.user);
     }
+    return res;
   };
 
-  // ✅ Usamos el archivo api.js para registro
   const handleRegister = async (email, password, name, address, phone) => {
-    const result = await registerUser(email, password, name, address, phone);
-    if (result.success) {
-      localStorage.setItem("currentUser", JSON.stringify(result.user));
-      setCurrentUser(result.user);
-      return { success: true };
-    } else {
-      return { success: false, message: result.message };
+    const res = await registerUser(email, password, name, address, phone); // ✅ Usa tu función de util/api
+    if (res.success) {
+      localStorage.setItem("currentUser", JSON.stringify(res.user));
+      setCurrentUser(res.user);
     }
+    return res;
   };
 
   return (
