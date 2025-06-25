@@ -11,13 +11,11 @@ const CheckoutSuccess = () => {
 
 useEffect(() => {
   const registerPurchase = async () => {
-    if (status === "approved" && !purchaseRegistered) {
-      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
+    const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const total = cartItems.reduce((sum, item) => sum + Number(item.price), 0);
 
-      if (!currentUser || cartItems.length === 0) return;
-
+    if (status === "approved" && currentUser && cartItems.length > 0 && !purchaseRegistered) {
       try {
         const res = await fetch("/.netlify/functions/add-purchase", {
           method: "POST",
@@ -26,23 +24,31 @@ useEffect(() => {
             user_id: currentUser.id,
             cartItems,
             amount: total,
-            payment_id: paymentId, // ✅ ahora se guarda el ID del pago
+            payment_id: paymentId, // 👈 se incluye el ID del pago
           }),
         });
 
         const data = await res.json();
+
         if (data.success) {
           setPurchaseRegistered(true);
-          localStorage.removeItem("cart");
+          localStorage.removeItem("cart"); // ✅ limpia el carrito
         }
       } catch (err) {
         console.error("Error al registrar la compra:", err);
       }
     }
+
+    // ⚠️ Seguridad: si ya está aprobado pero el carrito está vacío (porque se limpió antes),
+    // asegúrate de no dejar basura
+    if (status === "approved" && cartItems.length > 0) {
+      localStorage.removeItem("cart");
+    }
   };
 
   registerPurchase();
-}, [status, purchaseRegistered]);
+}, [status, paymentId, purchaseRegistered]);
+
 
 
   const renderContent = () => {
