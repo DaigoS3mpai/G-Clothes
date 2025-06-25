@@ -34,7 +34,14 @@ const ProductList = ({ products, onAddToCart }) => {
             />
           )}
           <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
-          <p className="text-gray-700 mb-2">${Number(product.price).toFixed(2)}</p>
+          <p className="text-gray-700 mb-2">
+          {new Intl.NumberFormat("es-CL", {
+            style: "currency",
+            currency: "CLP",
+            minimumFractionDigits: 0,
+           }).format(product.price)}
+          </p>
+
 
           <select
             className="w-full p-2 border rounded mb-3"
