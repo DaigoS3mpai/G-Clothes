@@ -1,43 +1,91 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
-  const total = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+  const total = cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+
+  const handleCheckout = async () => {
+    if (!currentUser) {
+      alert("Debes iniciar sesión para comprar");
+      return;
+    }
+
+    // Validar que todos los productos tengan talla
+    for (const item of cartItems) {
+      if (!item.selectedSize) {
+        alert(`Falta seleccionar talla para ${item.name}`);
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch("/api/add-purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          cartItems,
+          amount: total,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        onPurchase();
+        navigate("/checkout-success");
+      } else {
+        alert(data.message || "Error al procesar la compra");
+      }
+    } catch (err) {
+      console.error("Error al finalizar compra:", err);
+      alert("Error en el servidor");
+    }
+  };
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">Carrito de compras</h2>
+      <h2 className="text-xl font-semibold mb-4">Carrito de compras</h2>
 
       {cartItems.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
+        <p className="text-gray-600">Tu carrito está vacío.</p>
       ) : (
-        <div>
-          {cartItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex justify-between items-center border-b py-2"
+        <>
+          <ul className="space-y-4">
+            {cartItems.map((item, index) => (
+              <li key={index} className="flex justify-between items-center">
+                <div>
+                  <p className="font-medium">{item.name}</p>
+                  <p className="text-sm text-gray-600">
+                    Talla: <strong>{item.selectedSize || "No seleccionada"}</strong>
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span>${item.price.toFixed(2)}</span>
+                  <button
+                    className="text-red-500 text-sm hover:underline"
+                    onClick={() => onRemoveFromCart(index)}
+                  >
+                    Quitar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-6 text-right">
+            <p className="text-lg font-semibold">Total: ${total}</p>
+            <button
+              onClick={handleCheckout}
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
             >
-              <span>
-                {item.name} - Talla {item.size || "N/A"}
-              </span>
-              <span>${item.price.toFixed(2)}</span>
-              <button
-                className="text-red-600"
-                onClick={() => onRemoveFromCart(index)}
-              >
-                Quitar
-              </button>
-            </div>
-          ))}
-
-          <div className="mt-4 font-semibold">Total: ${total.toFixed(2)}</div>
-
-          <button
-            onClick={onPurchase}
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded"
-          >
-            Finalizar compra
-          </button>
-        </div>
+              Finalizar compra
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
