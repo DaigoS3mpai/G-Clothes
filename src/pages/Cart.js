@@ -37,7 +37,7 @@ const Cart = ({ cartItems, onRemoveFromCart, onPurchase }) => {
       const res = await fetch("/.netlify/functions/create-preference", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems }),
+        body: JSON.stringify({ items: cartItems }),
       });
 
       const data = await res.json();
