@@ -26,6 +26,13 @@ const ProductList = ({ products, onAddToCart }) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
       {products.map((product) => (
         <div key={product.id} className="border p-4 rounded shadow">
+          {product.image && (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 object-cover mb-3 rounded"
+            />
+          )}
           <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
           <p className="text-gray-700 mb-2">${product.price.toFixed(2)}</p>
 
@@ -35,10 +42,12 @@ const ProductList = ({ products, onAddToCart }) => {
             onChange={(e) => handleSizeChange(product.id, e.target.value)}
           >
             <option value="">Selecciona una talla</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
+            {Array.isArray(product.sizes) &&
+              product.sizes.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
           </select>
 
           <button
