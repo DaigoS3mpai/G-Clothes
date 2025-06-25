@@ -19,8 +19,6 @@ function App() {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  const [showLogin, setShowLogin] = useState(false);
-
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -46,7 +44,6 @@ function App() {
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
-      setShowLogin(false);
     }
     return res;
   };
@@ -56,7 +53,6 @@ function App() {
     if (res.success) {
       localStorage.setItem("currentUser", JSON.stringify(res.user));
       setCurrentUser(res.user);
-      setShowLogin(false);
     }
     return res;
   };
@@ -66,17 +62,8 @@ function App() {
       <Header
         cartCount={cartItems.length}
         currentUser={currentUser}
-        onLoginClick={() => setShowLogin(true)}
         onLogout={handleLogout}
       />
-
-      {showLogin && (
-        <Login
-          onLogin={handleLogin}
-          onRegister={handleRegister}
-          onClose={() => setShowLogin(false)}
-        />
-      )}
 
       <Routes>
         <Route
@@ -109,6 +96,16 @@ function App() {
           }
         />
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
+        <Route
+          path="/login"
+          element={
+            <Login
+              onLogin={handleLogin}
+              onRegister={handleRegister}
+              onClose={() => {}}
+            />
+          }
+        />
       </Routes>
     </Router>
   );
