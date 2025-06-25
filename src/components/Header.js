@@ -1,45 +1,40 @@
-// src/components/Header.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const Header = ({ cartCount = 0 }) => {
+const Header = ({ cartCount = 0, currentUser, onLogout }) => {
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const isLoggedIn = !!localStorage.getItem('currentUser');
-
-  const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    navigate('/');
+  const handleLoginClick = () => {
+    navigate('/login', { state: { from: location.pathname } });
   };
 
   return (
     <header className="bg-white shadow p-4 flex justify-between items-center">
-      <div
-        className="text-xl font-bold text-black cursor-pointer"
-        onClick={() => navigate('/')}
-      >
+      <Link to="/" className="text-xl font-bold">
         GClothes
-      </div>
+      </Link>
 
-      <nav className="flex gap-4 items-center">
-        <button onClick={() => navigate('/products')} className="text-gray-700 hover:text-blue-600">
+      <nav className="space-x-4">
+        <Link to="/products" className="hover:text-blue-500">
           Productos
-        </button>
-        <button onClick={() => navigate('/cart')} className="text-gray-700 hover:text-blue-600">
+        </Link>
+
+        <Link to="/cart" className="hover:text-blue-500">
           Carrito ({cartCount})
-        </button>
-        {isLoggedIn ? (
+        </Link>
+
+        {currentUser ? (
           <>
-            <button onClick={() => navigate('/profile')} className="text-gray-700 hover:text-blue-600">
+            <Link to="/profile" className="hover:text-blue-500">
               Perfil
-            </button>
-            <button onClick={handleLogout} className="text-red-500 hover:text-red-600">
+            </Link>
+            <button onClick={onLogout} className="text-red-600 hover:underline">
               Cerrar sesión
             </button>
           </>
         ) : (
-          <button onClick={() => navigate('/login')} className="text-blue-600 hover:underline">
+          <button onClick={handleLoginClick} className="text-blue-600 hover:underline">
             Iniciar sesión
           </button>
         )}
