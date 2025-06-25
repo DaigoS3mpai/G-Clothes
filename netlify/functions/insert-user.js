@@ -1,7 +1,8 @@
 const { Client } = require("pg");
 
 exports.handler = async (event) => {
-  const { name, email, password } = JSON.parse(event.body);
+  const { name, email, password, address, phone } = JSON.parse(event.body);
+
   const client = new Client({
     connectionString: process.env.NETLIFY_DATABASE_URL,
   });
@@ -10,8 +11,10 @@ exports.handler = async (event) => {
     await client.connect();
 
     const result = await client.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, password]
+      `INSERT INTO users (name, email, password, address, phone)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [name, email, password, address, phone]
     );
 
     return {
