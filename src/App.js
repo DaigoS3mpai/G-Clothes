@@ -1,5 +1,4 @@
-// src/App.js
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Products from "./pages/Products";
@@ -7,7 +6,6 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-import { loginUser, registerUser } from "./utils/api";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -41,26 +39,50 @@ function App() {
   };
 
   const handleLogin = async (email, password) => {
-    const res = await loginUser(email, password);
-    if (res.success) {
-      localStorage.setItem("currentUser", JSON.stringify(res.user));
-      setCurrentUser(res.user);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        setCurrentUser(data.user);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      return { success: false, message: "Error en el servidor." };
     }
-    return res;
   };
 
   const handleRegister = async (email, password, name, address, phone) => {
-    const res = await registerUser(email, password, name, address, phone);
-    if (res.success) {
-      localStorage.setItem("currentUser", JSON.stringify(res.user));
-      setCurrentUser(res.user);
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name, address, phone }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        setCurrentUser(data.user);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      return { success: false, message: "Error en el servidor." };
     }
-    return res;
   };
 
   return (
     <Router>
-      <Header cartCount={cartItems.length} currentUser={currentUser} onLogout={handleLogout} />
+      <Header cartCount={cartItems.length} />
       <Routes>
         <Route
           path="/"
@@ -70,7 +92,10 @@ function App() {
             </div>
           }
         />
-        <Route path="/products" element={<Products onAddToCart={addToCart} />} />
+        <Route
+          path="/products"
+          element={<Products onAddToCart={addToCart} />}
+        />
         <Route
           path="/cart"
           element={
@@ -83,7 +108,9 @@ function App() {
         />
         <Route
           path="/profile"
-          element={<Profile currentUser={currentUser} onLogout={handleLogout} />}
+          element={
+            <Profile currentUser={currentUser} onLogout={handleLogout} />
+          }
         />
         <Route
           path="/login"
