@@ -1,74 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const Products = ({ onAddToCart }) => {
   const [products, setProducts] = useState([]);
-  const [selectedSizes, setSelectedSizes] = useState({});
+  const [sizes, setSizes] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await fetch("/api/get-products");
         const data = await res.json();
-        if (data.success) setProducts(data.products);
+        if (data.success) {
+          setProducts(data.products);
+        } else {
+          setError("No se pudieron cargar los productos.");
+        }
       } catch (err) {
         console.error("Error al obtener productos:", err);
+        setError("Error en el servidor.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
 
-  const handleSizeChange = (productId, size) => {
-    setSelectedSizes((prev) => ({ ...prev, [productId]: size }));
-  };
-
   const handleAddToCart = (product) => {
-    const selectedSize = selectedSizes[product.id];
+    const selectedSize = sizes[product.id];
     if (!selectedSize) {
-      alert("Selecciona una talla antes de agregar al carrito");
+      alert("Debes seleccionar una talla.");
       return;
     }
 
-    const itemToAdd = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-    };
-
-    onAddToCart(itemToAdd);
+    onAddToCart({ ...product, selectedSize });
   };
 
+  const handleSizeChange = (productId, value) => {
+    setSizes((prev) => ({ ...prev, [productId]: value }));
+  };
+
+  if (loading) return <div className="p-6">Cargando productos...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
-    <div className="p-4">
-      <h1 className="text-2xl mb-4">Productos</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <div key={product.id} className="border p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">{product.name}</h2>
-            <p>${product.price.toFixed(2)}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
+      {products.map((product) => (
+        <div key={product.id} className="border p-4 rounded shadow">
+          <h3 className="text-lg font-semibold">{product.name}</h3>
+          <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
 
-            <select
-              value={selectedSizes[product.id] || ""}
-              onChange={(e) => handleSizeChange(product.id, e.target.value)}
-              className="mt-2 w-full border p-1 rounded"
-            >
-              <option value="">Selecciona talla</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-            </select>
+          <select
+            className="w-full border p-2 rounded mb-3"
+            value={sizes[product.id] || ""}
+            onChange={(e) => handleSizeChange(product.id, e.target.value)}
+          >
+            <option value="">Selecciona talla</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+          </select>
 
-            <button
-              onClick={() => handleAddToCart(product)}
-              className="mt-2 w-full bg-green-600 text-white py-1 rounded"
-            >
-              Agregar al carrito
-            </button>
-          </div>
-        ))}
-      </div>
+          <button
+            className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+            onClick={() => handleAddToCart(product)}
+          >
+            Agregar al carrito
+          </button>
+        </div>
+      ))}
     </div>
   );
 };
