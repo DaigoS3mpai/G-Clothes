@@ -11,7 +11,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const accessToken = process.env.MP_ACCESS_TOKEN; // ⚠️ Define esto en tu entorno Netlify
+    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN; // ⚠️ Define esto en tu entorno Netlify
     if (!accessToken) {
       return {
         statusCode: 500,
