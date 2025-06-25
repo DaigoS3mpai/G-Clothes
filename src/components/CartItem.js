@@ -9,17 +9,24 @@ const CartItem = ({ item, index, onRemove }) => {
     }).format(price);
 
   return (
-    <li className="flex justify-between items-center border-b pb-2 mb-2">
-      <div>
-        <p className="font-medium">{item.name}</p>
+    <li className="flex items-center border-b pb-4 mb-4 gap-4">
+      {item.image && (
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-20 h-20 object-cover rounded"
+        />
+      )}
+      <div className="flex-1">
+        <p className="font-medium text-lg">{item.name}</p>
         <p className="text-sm text-gray-600">
           Talla: <strong>{item.selectedSize || "No seleccionada"}</strong>
         </p>
       </div>
-      <div className="flex items-center gap-4">
-        <span>{formatPrice(item.price)}</span>
+      <div className="text-right">
+        <p className="text-md">{formatPrice(item.price)}</p>
         <button
-          className="text-red-500 text-sm hover:underline"
+          className="text-red-500 text-sm hover:underline mt-1"
           onClick={() => onRemove(index)}
         >
           Quitar
