@@ -11,13 +11,14 @@ const Products = ({ onAddToCart }) => {
       try {
         const res = await fetch("/.netlify/functions/get-products");
         const data = await res.json();
-        if (data.success) {
+        if (data.success && Array.isArray(data.products)) {
           setProducts(data.products);
         } else {
+          console.error("❌ Respuesta inesperada:", data);
           setError("No se pudieron cargar los productos.");
         }
       } catch (err) {
-        console.error("❌ Error al obtener productos:", err);
+        console.error("❌ Error en fetch:", err);
         setError("Error en el servidor.");
       } finally {
         setLoading(false);
@@ -46,31 +47,38 @@ const Products = ({ onAddToCart }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-      {products.map((product) => (
-        <div key={product.id} className="border p-4 rounded shadow">
-          <h3 className="text-lg font-semibold">{product.name}</h3>
-          <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
+      {products.map((product) => {
+        if (!product || !product.id || !product.name || typeof product.price !== "number") {
+          console.warn("❗ Producto inválido:", product);
+          return null;
+        }
 
-          <select
-            className="w-full border p-2 rounded mb-3"
-            value={sizes[product.id] || ""}
-            onChange={(e) => handleSizeChange(product.id, e.target.value)}
-          >
-            <option value="">Selecciona talla</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-          </select>
+        return (
+          <div key={product.id} className="border p-4 rounded shadow">
+            <h3 className="text-lg font-semibold">{product.name}</h3>
+            <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
 
-          <button
-            className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
-            onClick={() => handleAddToCart(product)}
-          >
-            Agregar al carrito
-          </button>
-        </div>
-      ))}
+            <select
+              className="w-full border p-2 rounded mb-3"
+              value={sizes[product.id] || ""}
+              onChange={(e) => handleSizeChange(product.id, e.target.value)}
+            >
+              <option value="">Selecciona talla</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+
+            <button
+              className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+              onClick={() => handleAddToCart(product)}
+            >
+              Agregar al carrito
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };
