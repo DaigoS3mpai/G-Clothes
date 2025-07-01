@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAllProducts } from '../utils/api';
 
+
 const Home = ({ onAddToCart }) => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
