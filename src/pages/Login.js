@@ -164,12 +164,13 @@ const Login = ({ onLogin, onRegister, onClose }) => {
           )}
         </div>
 
-        <button
-          onClick={onClose}
-          className="mt-4 w-full py-1 text-sm text-gray-500 hover:text-black"
-        >
-          ✖️ Cancelar
-        </button>
+          <button
+            onClick={() => navigate(previousPath)}
+            className="mt-4 w-full py-1 text-sm text-gray-500 hover:text-black"
+          >
+            ✖️ Cancelar
+          </button>
+
       </div>
     </div>
   );
