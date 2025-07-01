@@ -6,6 +6,7 @@ import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import Home from "./pages/Home";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import { loginUser, registerUser } from "./utils/api";
 
@@ -68,11 +69,10 @@ function App() {
 
       <Routes>
         <Route
-          path="/"
-          element={
-            <div className="text-center mt-10 text-green-600">
-              Página de inicio
-            </div>
+            path="/"
+            element={<Home onAddToCart={addToCart} />}
+            />
+
           }
         />
         <Route
